@@ -1,2 +1,2 @@
-# widesky
+# Wildsky
 First Fleek Website
