@@ -1,0 +1,60 @@
+#include <SPI.h>
+#include <mcp_can.h>
+
+#define CAN_CS 5
+#define CAN_INT 4
+
+MCP_CAN CAN(CAN_CS);
+
+void setup()
+{
+    Serial.begin(115200);
+
+    while (CAN.begin(MCP_ANY,
+                      CAN_500KBPS,
+                      MCP_8MHZ)
+           != CAN_OK)
+    {
+        Serial.println("CAN init failed");
+        delay(1000);
+    }
+
+    CAN.setMode(MCP_NORMAL);
+
+    pinMode(CAN_INT, INPUT);
+
+    Serial.println("CAN Logger Started");
+}
+
+void loop()
+{
+    if (!digitalRead(CAN_INT))
+    {
+        unsigned long id;
+        byte len;
+        byte buf[8];
+
+        CAN.readMsgBuf(&id, &len, buf);
+
+        Serial.print(millis());
+        Serial.print(",");
+
+        Serial.print(id, HEX);
+        Serial.print(",");
+
+        for(int i=0;i<len;i++)
+        {
+            if(buf[i] < 16)
+                Serial.print("0");
+
+            Serial.print(buf[i], HEX);
+
+            if(i < len-1)
+                Serial.print(",");
+        }
+
+        Serial.println();
+    }
+}
+
+Link: https://chatgpt.com/s/t_6a1add93798c81918b492f762da4f70b
